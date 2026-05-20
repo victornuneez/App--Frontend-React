@@ -1,13 +1,17 @@
 import TagsFilterComponent from "./components/TagsFilter.jsx";
 import LinksListComponent from "./components/LinksList.jsx";
-import { Fragment } from "react";
+import LinkDetailsComponent from "./components/LinkDetails.jsx";
+
 import { useState, useEffect } from "react";
-import { getTags, getLinks } from './api/api.js';
+import { getTags, getLinks, deleteLink } from './api/api.js';
+
 const App = () => {
 
   const [tags, setTags] = useState([]) // variable de estado de los tag iniciales
   const [selectedTag, setSelectedTag] = useState("Todos") // varaible de estado de los tags seleccionados para filtrar.
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState([]); // variable de estado de los enlaces.
+  const [seeMoreID, setSeeMoreID] = useState(null) // variable de estado que guarda el id del enlace que queremos ver a detalle.
+  const [updateLink, setUpdateLink] = useState(null) // guarda el id del enlace que el usuario quiere guardar.
 
   // EFECTO 1: para obtener las tags de la base de datos una vez renderizado el componente
   useEffect(() => {
@@ -37,7 +41,7 @@ const App = () => {
     };
 
     loadLinks(); //Ejecutamos la funcion
-  }, [selectedTag]) // React se queda vigilando esta variable.
+  }, [selectedTag]) // Cada vez que cambie el valor de esta variable de estado se ejecutar este useEffect.
 
   const handleFilter = (id) => {
     let dataFilter;
@@ -51,18 +55,81 @@ const App = () => {
     setSelectedTag(dataFilter); // Le asignamos a la variable de estado tag, el valor de la etiquetada seleccionada
   };
 
+  const handleSeeMore = (id) => {
+    setSeeMoreID(id);
+  };
 
+  const handleBackButton = () => {
+    setSeeMoreID(null) // Al pasar null, cambia la condicion y destruye el componente de detalle y vuelve a renderizar el del filtro y resultados.
+  };
+
+  const handleDeleteLink = async (id) => {
+    try {
+      await deleteLink(id);
+      // Creamos un nuevo array con los links que no sean igual al id del enlace eliminado.
+      const updateLinks = links.filter(link => link._id !== id);
+      setLinks(updateLinks) // Guardamos el nuevo array filtrado en la variable de estado para renderizar de nuevo la vista sin recargar la pagina.
+      
+    } catch (error) {
+      console.error('Hubo un error al intentar eliminar el enlace: ', error.message);
+    }
+  }
+  // Funcion para controlar la vista del formulario de edicion.
+  const handleEditButton = (id) => {
+    setUpdateLink(id);
+  }
+
+  // Esta funcion se ejecuta cuando la actualizacion termino correctamente
+  const handleUpdateLink = async () => {
+    setUpdateLink(null); // esto cierra la pantalla de edicion.(el formulario)
+    setSelectedTag(selectedTag); // volvemos a setear la variable de estado de tags para que vuelva a pedir los links para tener los links actualizados
+  }
+
+// Si hay un id en la variable de estado de ver mas entonces se renderiza esta vista.
+if(seeMoreID) {
   return (
-    <Fragment>
+    <div className="app-container">
+      <LinkDetailsComponent 
+      linkID = {seeMoreID} 
+      onBack = {handleBackButton} />
+    </div>
+          )
+
+  } 
+  
+// Si hay un id en la variable de estado de actualizar los datos de un enlace entonces se renderiza el formulario de actualizacion. 
+  if(updateLink) {
+    return (
       <div className="app-container">
-        <h1>Enlaces</h1>
-        <TagsFilterComponent tags={tags} filter={handleFilter}/>
-        <LinksListComponent  links = {links}/>
+        <updateLinkComponent 
+        linkId = {updateLink}
+        onLinkUpdate = {handleUpdateLink}
+        />
+
       </div>
-    </Fragment>
-  )
+    )
+  }
+  
+  else {
+    return (
+      <>
+        <TagsFilterComponent 
+        tags={tags} 
+        filter={handleFilter}/>
+
+        <LinksListComponent  
+        links = {links} 
+        seeMore = {handleSeeMore} 
+        onDelete = {handleDeleteLink}
+        onUpdate = {handleEditButton}
+        />
+      </>
+          )
+        }
+
+
 }
+
 
 export default App;
 
-// NOTA: EL FILTRO DE ANIMACIONES NO DEVUELVE NADA PORQUE NO HAY UN ENLACE CON LA CATEGORIA ANIMACIONES.
