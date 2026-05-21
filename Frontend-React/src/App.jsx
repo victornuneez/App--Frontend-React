@@ -1,6 +1,7 @@
 import TagsFilterComponent from "./components/TagsFilter.jsx";
 import LinksListComponent from "./components/LinksList.jsx";
 import LinkDetailsComponent from "./components/LinkDetails.jsx";
+import UpdateLinkComponent from "./components/UpdateLink.jsx";
 
 import { useState, useEffect } from "react";
 import { getTags, getLinks, deleteLink } from './api/api.js';
@@ -10,9 +11,9 @@ const App = () => {
   const [tags, setTags] = useState([]) // variable de estado de los tag iniciales
   const [selectedTag, setSelectedTag] = useState("Todos") // varaible de estado de los tags seleccionados para filtrar.
   const [links, setLinks] = useState([]); // variable de estado de los enlaces.
+  
   const [seeMoreID, setSeeMoreID] = useState(null) // variable de estado que guarda el id del enlace que queremos ver a detalle.
-  const [updateLink, setUpdateLink] = useState(null) // guarda el id del enlace que el usuario quiere guardar.
-
+  const [updateLinkID, setUpdateLinkID] = useState(null) // guarda el id del enlace que el usuario quiere guardar.
   // EFECTO 1: para obtener las tags de la base de datos una vez renderizado el componente
   useEffect(() => {
     const loadTags = async () => {
@@ -76,13 +77,23 @@ const App = () => {
   }
   // Funcion para controlar la vista del formulario de edicion.
   const handleEditButton = (id) => {
-    setUpdateLink(id);
+    setUpdateLinkID(id);
   }
 
-  // Esta funcion se ejecuta cuando la actualizacion termino correctamente
-  const handleUpdateLink = async () => {
-    setUpdateLink(null); // esto cierra la pantalla de edicion.(el formulario)
-    setSelectedTag(selectedTag); // volvemos a setear la variable de estado de tags para que vuelva a pedir los links para tener los links actualizados
+  // Esta funcion sirve para actualizar un enlace dentro del estado sin volver a pedir todos los datos al backend.
+  const handleUpdateLink = async (linkUpdate) => {
+    setUpdateLinkID(null); // esto cierra la pantalla de edicion.(el formulario) React deja de mostrarlo.
+    
+    // Buscamos el id del enlace que actualizamos, si lo encontramos reemplazamos el mismo enlace por el nuevo enlace actualizado dentro del array. 
+    const updateLinksList = links.map(link => {
+      if(link._id === linkUpdate._id) {
+        return linkUpdate; // retornamos el enlace modificado dentro de updateLinkList.
+      }
+
+      return link; // Si no lo encontramos devolvemos los enlaces como estaban
+    });
+
+    setLinks(updateLinksList); // Guardamos el nuevo enlace actualizado para renderizar el enlace con sus datos actualizados.
   }
 
 // Si hay un id en la variable de estado de ver mas entonces se renderiza esta vista.
@@ -98,12 +109,12 @@ if(seeMoreID) {
   } 
   
 // Si hay un id en la variable de estado de actualizar los datos de un enlace entonces se renderiza el formulario de actualizacion. 
-  if(updateLink) {
+  if(updateLinkID) {
     return (
       <div className="app-container">
-        <updateLinkComponent 
-        linkId = {updateLink}
-        onLinkUpdate = {handleUpdateLink}
+        <UpdateLinkComponent 
+        linkId = {updateLinkID}
+        onLinkUpdateSuccess = {handleUpdateLink}
         />
 
       </div>
