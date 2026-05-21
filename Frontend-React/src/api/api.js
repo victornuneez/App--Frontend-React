@@ -71,7 +71,7 @@ const updateLink = async (id, title, url, description) => {
             headers : {
                 'Content-Type' : 'application/json'
             },
-            body: JSON.stringify(title, url, description)
+            body: JSON.stringify({title, url, description})
             });
 
         if(!response.ok) throw new Error('No se pudo actualizar los datos del enlace');
