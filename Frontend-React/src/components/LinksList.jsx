@@ -10,7 +10,7 @@ const LinksListComponent = (props) => {
                     <p>Descripcion: {link.description}</p>
                     <button className="tag-button" onClick={() => seeMore(link._id)}>Ver mas</button>
                     <button className="tag-button" onClick={() => onUpdate(link._id)}>Editar</button>
-                    <button onClick={() => onDelete(link._id)}>Eliminar</button>
+                    <button className="tag-button" onClick={() => onDelete(link._id)}>Eliminar</button>
             </div>
                 ))}
         </div>
