@@ -10,7 +10,6 @@ const LinkDetailsComponent = (props) => {
         const loadDetails = async () => {
             try {
                 const data = await getLinksDetails(linkID);
-                console.log(data)
                 setLink(data);
             
             } catch (error) {
