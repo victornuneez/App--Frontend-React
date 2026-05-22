@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getLinksDetails, updateLink } from '../api/api';
 
 const UpdateLinkComponent = (props) => {
-    const { linkId, onLinkUpdateSuccess } = props;
+    const { linkId, onLinkUpdateSuccess, onBack } = props;
 
     // Estos estados guardan los datos actuales que quieren editar y tambien guardan los nuevos datos de cada input.
     const [title, setTitle] = useState("");
@@ -48,6 +48,7 @@ const UpdateLinkComponent = (props) => {
 
     return (
         <div className='edit-form-container'>
+            <button onClick={onBack}>Volver al inicio</button>
             <h2>Editar Enlace</h2>
             <form onSubmit={handleSubmit}>
                 <div>
