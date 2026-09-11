@@ -166,13 +166,4 @@ Para apuntar a otro backend, actualizar las URLs en ese archivo.
 
 ---
 
-
-## 📌 Notas
-
-- El `useEffect` de `tags` en `App.jsx` tiene `[tags]` como dependencia, lo que puede causar re-renders. Para optimizar, se puede cambiar a `[]`.
-- La actualización de votos y comentarios en `LinkDetails.jsx` usa spread operator (`...link`) para mantener todos los campos y sobreescribir solo el campo modificado, evitando un fetch adicional.
-- El formulario de `UpdateLink.jsx` muestra un `<p>Cargando...</p>` mientras los datos del enlace no estén disponibles, evitando inputs vacíos en el primer render.
-
----
-
 *© Todos los derechos reservados — Victor Nunez*
